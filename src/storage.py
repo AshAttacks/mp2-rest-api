@@ -14,24 +14,24 @@ class DatasetStorage:
         self._counter = self._counter + 1
         dataset_id = self._counter
         self._store[dataset_id] = {"filename": filename, "df": df.copy()}
-        logger.debug("Stored dataset: id=%s, rows=%s", dataset_id, len(df))
+        logger.debug(f"Stored dataset: id={dataset_id}, rows={len(df)}")
         return dataset_id
 
     def get(self, dataset_id):
         """Return a copy of the stored DataFrame, or None."""
         dataset = self._store.get(dataset_id)
         if dataset is None:
-            logger.debug("Dataset not found: id=%s", dataset_id)
+            logger.debug(f"Dataset not found: id={dataset_id}")
             return None
         df = dataset["df"].copy()
-        logger.debug("Retrieved dataset copy: id=%s, rows=%s", dataset_id, len(df))
+        logger.debug(f"Retrieved dataset copy: id={dataset_id}, rows={len(df)}")
         return df
 
     def get_metadata(self, dataset_id):
         """Return the dataset metadata, or None."""
         dataset = self._store.get(dataset_id)
         if dataset is None:
-            logger.debug("Metadata not found: id=%s", dataset_id)
+            logger.debug(f"Metadata not found: id={dataset_id}")
             return None
         # Read the current DataFrame so metadata reflects any updates
         df = dataset["df"]
@@ -42,16 +42,16 @@ class DatasetStorage:
             "columns": df.shape[1],
             "column_names": df.columns.tolist(),
         }
-        logger.debug("Retrieved dataset metadata: id=%s", dataset_id)
+        logger.debug(f"Retrieved dataset metadata: id={dataset_id}")
         return metadata
 
     def update(self, dataset_id, df):
         """Replace an existing dataset; return True, or False if missing."""
         if dataset_id not in self._store:
-            logger.debug("Cannot update missing dataset: id=%s", dataset_id)
+            logger.debug(f"Cannot update missing dataset: id={dataset_id}")
             return False
         self._store[dataset_id]["df"] = df.copy()
-        logger.debug("Updated dataset: id=%s, rows=%s", dataset_id, len(df))
+        logger.debug(f"Updated dataset: id={dataset_id}, rows={len(df)}")
         return True
 
     def clear(self):

@@ -23,14 +23,14 @@ async def upload_dataset(file: UploadFile = File(...)):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix != '.csv':
         logger.error(f'Unsupported file format: {suffix}')
-        raise HTTPException(400)
+        raise HTTPException(400, 'Unsupported or unreadable CSV upload')
 
     try:
         contents = await file.read()
         df = pd.read_csv(io.BytesIO(contents))
-    except pd.errors.EmptyDataError or pd.errors.ParserError or UnicodeDecodeError:
-        logger.error("Empty upload file")
-        raise HTTPException(400)
+    except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError):
+        logger.error("Unable to read CSV file")
+        raise HTTPException(400, 'Unsupported or unreadable CSV upload')
 
 
     dataset_id = storage.save(df, file.filename)
@@ -51,7 +51,7 @@ def get_dataset(dataset_id: int, limit: int = Query(default=100, ge=1)):
     df = storage.get(dataset_id)
     if df is None:
         logger.warning("Dataset not found")
-        raise HTTPException(404)
+        raise HTTPException(404,' Dataset ID not found')
 
     records = json.loads(df.head(limit).to_json(orient="records"))
     logger.info(f'Returned dataset id: {dataset_id} | Returned Rows {len(df.head(limit))}')
