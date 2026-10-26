@@ -22,14 +22,14 @@ async def upload_dataset(file: UploadFile = File(...)):
     """Read and store a CSV upload."""
     suffix = Path(file.filename or "").suffix.lower()
     if suffix != '.csv':
-        logger.error(f'Unsupported file format: {suffix}')
+        logger.warning(f'Unsupported file format: {suffix}')
         raise HTTPException(400, 'Unsupported or unreadable CSV upload')
 
     try:
         contents = await file.read()
         df = pd.read_csv(io.BytesIO(contents))
     except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError):
-        logger.error("Unable to read CSV file")
+        logger.warning("Unable to read CSV file")
         raise HTTPException(400, 'Unsupported or unreadable CSV upload')
 
 
