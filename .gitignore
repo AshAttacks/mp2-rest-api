@@ -8,3 +8,4 @@ venv/
 
 # Files
 .pytest_cache/
+class_mc/
